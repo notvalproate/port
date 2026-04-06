@@ -39,7 +39,7 @@ PORTFOLIO_FILE = "portfolio.csv"
 NIFTY_TICKER = "^NSEI"
 SENSEX_TICKER = "^BSESN"
 MIDCAP_TICKER = "NIFTY_MIDCAP_100.NS"
-SMALLCAP_TICKER = "NIFTYSMLCAP250.NS"
+SMALLCAP_TICKER = "NIFTYSMLCAP50.NS"
 
 # ==============================
 # SECTOR TICKERS
@@ -139,12 +139,11 @@ for r in results:
 # ---------------------------
 # PORTFOLIO RETURNS
 # ---------------------------
-portfolio_return = (
-    (total_value_today - total_value_yesterday)
-    / total_value_yesterday
-) * 100
+portfolio_return_amt = total_value_today - total_value_yesterday
+portfolio_return = (portfolio_return_amt / total_value_yesterday) * 100
 
 total_profit = total_value_today - total_cost
+total_profit_perc = (total_profit * 100) / total_cost
 
 # ---------------------------
 # NIFTY RETURN
@@ -190,8 +189,11 @@ log("===========================")
 log(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
 
 log(f"\nPortfolio Cost: ₹{total_cost:,.0f}")
-log(f"\nPortfolio Value: ₹{total_value_today:,.0f}")
+log(f"Portfolio Value: ₹{total_value_today:,.0f}")
+
+log(f"\n1D Profit/Loss: {plus(portfolio_return_amt)}₹{portfolio_return_amt:,.0f}")
 log(f"Total Profit/Loss: {plus(total_profit)}₹{total_profit:,.0f}")
+log(f"Total P/L %: {plus(total_profit_perc)}{total_profit_perc:.2f}")
 
 log(f"\n1D Nifty Return: {plus(nifty_return)}{nifty_return:.2f}%")
 log(f"1D Portfolio Return: {plus(portfolio_return)}{portfolio_return:.2f}%")
