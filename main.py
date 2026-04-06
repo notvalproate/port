@@ -50,12 +50,29 @@ SMALLCAP_TICKER = "NIFTYSMLCAP50.NS"
 # SECTOR TICKERS
 # ==============================
 
-NIFTY_IT_TICKER = "^CNXIT"
-NIFTY_BANK_TICKER = "^NSEBANK"
 NIFTY_AUTO_TICKER = "^CNXAUTO"
+NIFTY_FIN_TICKER = "NIFTY_FIN_SERVICE.NS"
+NIFTY_IT_TICKER = "^CNXIT"
+NIFTY_MEDIA_TICKER = "^CNXMEDIA"
 NIFTY_METAL_TICKER = "^CNXMETAL"
+NIFTY_PHARMA_TICKER = "^CNXPHARMA"
+NIFTY_BANK_TICKER = "^NSEBANK"
 NIFTY_PSU_BANK_TICKER = "^CNXPSUBANK"
+NIFTY_REALTY_TICKER = "^CNXREALTY"
 NIFTY_FMCG_TICKER = "^CNXFMCG"
+
+SECTOR_TICKER_LIST = [
+    NIFTY_AUTO_TICKER,
+    NIFTY_FIN_TICKER,
+    NIFTY_IT_TICKER,
+    NIFTY_MEDIA_TICKER,
+    NIFTY_METAL_TICKER,
+    NIFTY_PHARMA_TICKER,
+    NIFTY_BANK_TICKER,
+    NIFTY_PSU_BANK_TICKER,
+    NIFTY_REALTY_TICKER,
+    NIFTY_FMCG_TICKER,
+]
 
 # ---------------------------
 # LOAD PORTFOLIO
@@ -64,10 +81,7 @@ portfolio = pd.read_csv(PORTFOLIO_FILE)
 portfolio["YF_Ticker"] = portfolio["TICKER"] + ".NS"
 
 tickers = list(portfolio["YF_Ticker"]) + [NIFTY_TICKER, SENSEX_TICKER, 
-                                          MIDCAP_TICKER, SMALLCAP_TICKER,
-                                            NIFTY_IT_TICKER, NIFTY_BANK_TICKER, 
-                                            NIFTY_AUTO_TICKER, NIFTY_METAL_TICKER, 
-                                            NIFTY_PSU_BANK_TICKER, NIFTY_FMCG_TICKER]
+                                          MIDCAP_TICKER, SMALLCAP_TICKER] + SECTOR_TICKER_LIST
 
 # ---------------------------
 # DOWNLOAD DATA
@@ -315,11 +329,15 @@ log("🏭 SECTOR STRENGTH")
 log("===========================\n")
 
 SECTOR_TICKERS = {
-    "IT": NIFTY_IT_TICKER,
-    "Banking": NIFTY_BANK_TICKER,
     "Auto": NIFTY_AUTO_TICKER,
+    "Finance": NIFTY_FIN_TICKER,
+    "IT": NIFTY_IT_TICKER,
+    "Media": NIFTY_MEDIA_TICKER,
     "Metal": NIFTY_METAL_TICKER,
-    "PSU Bank": NIFTY_PSU_BANK_TICKER,
+    "Pharma": NIFTY_PHARMA_TICKER,
+    "Banking": NIFTY_BANK_TICKER,
+    "PSU Banking": NIFTY_PSU_BANK_TICKER,
+    "Realty": NIFTY_REALTY_TICKER,
     "FMCG": NIFTY_FMCG_TICKER,
 }
 
@@ -334,11 +352,9 @@ for name, symbol in SECTOR_TICKERS.items():
 
 sector_perf.sort(key=lambda x: x[1], reverse=True)
 
-log("Top 3 sectors today:")
-top3 = sector_perf[:3]
-
-for s in top3:
-    log(f"{s[0]} → {s[1]:.2f}%")   
+log("Sector-wise performance today:")
+for s in sector_perf:
+    log(f"{s[0]:12} → {f"{s[1]:.2f}%":>6}")   
      
 log("\n===========================")
 
