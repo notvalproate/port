@@ -73,18 +73,17 @@ def buy_order(df):
 # ======================================
 def sell_order(df):
 
-    ticker = input("Ticker to sell: ").upper()
+    ticker = input("Ticker sold: ").upper()
 
     if ticker not in df["TICKER"].values:
         print("❌ Stock not found.")
         return df
 
-    qty = int(input("Quantity to sell: "))
-    price = float(input("Sell Price: "))
+    qty = int(input("Quantity sold: "))
+    price = float(input("New Avg After Sell: "))
 
     idx = df.index[df["TICKER"] == ticker][0]
     current_qty = df.at[idx, "QUANTITY"]
-    current_avg = df.at[idx, "AVG_PRICE"]
 
     if qty > current_qty:
         print("❌ Cannot sell more than owned.")
@@ -96,12 +95,8 @@ def sell_order(df):
         df = df[df["TICKER"] != ticker]
         print("✅ Position exited.")
     else:
-        sold_amount = qty * price
-        remaining_amount = (current_avg * current_qty) - sold_amount
-        new_avg = remaining_amount / remaining_qty
-
         df.at[idx, "QUANTITY"] = remaining_qty
-        df.at[idx, "AVG_PRICE"] = round(new_avg, 2)
+        df.at[idx, "AVG_PRICE"] = round(price, 2)
         print("✅ Quantity reduced.")
 
     return df

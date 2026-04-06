@@ -1,10 +1,16 @@
+import os
+import locale
 import pandas as pd
 import yfinance as yf
 import requests
 from datetime import datetime
 import pytz
 
-REPORT_FILE = "report.txt"
+now = datetime.now(pytz.timezone("Asia/Kolkata"))
+
+REPORT_DIR = "reports"
+DAILY_REPORT_FILE = f"{now.strftime("%Y_%m_%d")}.txt"
+REPORT_FILE = "latest.txt"
 report_lines = []
 
 def log(line=""):
@@ -14,8 +20,7 @@ def plus(val):
     return '+' if val > 0 else ''
 
 def market_open():
-    india = pytz.timezone("Asia/Kolkata")
-    now = datetime.now(india)
+    global now
 
     return (
         now.weekday() < 5 and
@@ -108,6 +113,7 @@ for i, row in portfolio.iterrows():
             "invested": invested,
             "value_today": value_today,
             "daily_pnl": daily_pnl,
+            "total_pnl": total_pnl,
             "daily_perc": daily_perc,
             "total_perc": total_perc
         })
@@ -123,18 +129,28 @@ results.sort(key=lambda x: x["daily_perc"], reverse=True)
 # ---------------------------
 # PRINT SORTED OUTPUT
 # ---------------------------
-log("\n📈 STOCK PERFORMANCE (Sorted by Day %)")
-log("--------------------------------------")
+
+log(f"\n📈 STOCK PERFORMANCE | {now.strftime("%d/%m/%Y")} | (Sorted by Day %)\n")
+log("--------------------------------------------------------------------------------")
+log(f"TICKER     || Invested ||    Today ||       Day | Total P&L  ||   Day% | Total%")
+log("--------------------------------------------------------------------------------")
+
+loser_line = False
 
 for r in results:
+    if r['daily_perc'] < 0 and not loser_line:
+        loser_line = True
+        log("---------------------------------TODAY'S LOSERS---------------------------------")
+
     log(
-        f"{r['ticker']:12} "
-        f"Invested: ₹{r['invested']:,.0f} | "
-        f"Today: ₹{r['value_today']:,.0f} | "
-        f"Total %: {plus(r['total_perc'])}{r['total_perc']:,.2f}% | "
-        f"Day P&L: ₹{r['daily_pnl']:,.2f} | "
-        f"Day %: {plus(r['daily_perc'])}{r['daily_perc']:,.2f}%"
+        f"{r['ticker']:10} || "
+        f"{f"₹{r['invested']:,.0f}":>8} || "
+        f"{f"₹{r['value_today']:,.0f}":>8} || "
+        f"{f"₹{r['daily_pnl']:,.2f}":>9} | {f"₹{r['total_pnl']:,.2f}":<10} || "
+        f"{plus(r['daily_perc'])}{r['daily_perc']:,.2f}% | {plus(r['total_perc'])}{r['total_perc']:,.2f}%"
     )
+
+log("--------------------------------------------------------------------------------")
 
 # ---------------------------
 # PORTFOLIO RETURNS
@@ -183,16 +199,18 @@ market_status = get_market_status()
 # ---------------------------
 # FINAL REPORT
 # ---------------------------
+locale.setlocale(locale.LC_ALL, "en_IN.UTF-8")
+
 log("\n===========================")
 log("📊 DAILY PORTFOLIO REPORT")
 log("===========================")
 log(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
 
-log(f"\nPortfolio Cost: ₹{total_cost:,.0f}")
-log(f"Portfolio Value: ₹{total_value_today:,.0f}")
+log(f"\nPortfolio Cost: ₹{locale.format_string("%d", total_cost, grouping=True)}")
+log(f"Portfolio Value: ₹{locale.format_string("%d", total_value_today, grouping=True)}")
 
-log(f"\n1D Profit/Loss: {plus(portfolio_return_amt)}₹{portfolio_return_amt:,.0f}")
-log(f"Total Profit/Loss: {plus(total_profit)}₹{total_profit:,.0f}")
+log(f"\n1D Profit/Loss: {plus(portfolio_return_amt)}₹{locale.format_string("%d", portfolio_return_amt, grouping=True)}")
+log(f"Total Profit/Loss: {plus(total_profit)}₹{locale.format_string("%d", total_profit, grouping=True)}")
 log(f"Total P/L %: {plus(total_profit_perc)}{total_profit_perc:.2f}")
 
 log(f"\n1D Nifty Return: {plus(nifty_return)}{nifty_return:.2f}%")
@@ -324,7 +342,15 @@ for s in top3:
      
 log("\n===========================")
 
-with open(REPORT_FILE, "w", encoding="utf-8") as f:
+os.makedirs(REPORT_DIR, exist_ok=True)
+report_path = os.path.join(REPORT_DIR, REPORT_FILE)
+daily_report_path = os.path.join(REPORT_DIR, DAILY_REPORT_FILE)
+
+with open(report_path, "w", encoding="utf-8") as f:
+    for line in report_lines:
+        f.write(line + "\n")
+
+with open(daily_report_path, "w", encoding="utf-8") as f:
     for line in report_lines:
         f.write(line + "\n")
 
