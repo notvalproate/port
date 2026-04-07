@@ -86,9 +86,11 @@ tickers = list(portfolio["YF_Ticker"]) + [NIFTY_TICKER, SENSEX_TICKER,
 # ---------------------------
 # DOWNLOAD DATA
 # ---------------------------
+DATA_PERIOD_IN_DAYS = 6
+
 data = yf.download(
     tickers,
-    period="2d",
+    period=f"{DATA_PERIOD_IN_DAYS}d",
     interval="1d",
     group_by="ticker",
     progress=False
@@ -96,6 +98,8 @@ data = yf.download(
 
 total_value_today = 0
 total_value_yesterday = 0
+total_value_3d = 0
+total_value_5d = 0
 total_cost = 0
 results = []
 
@@ -108,9 +112,13 @@ for i, row in portfolio.iterrows():
     try:
         close_today = data[ticker]["Close"].iloc[-1]
         close_yesterday = data[ticker]["Close"].iloc[-2]
+        close_3d = data[ticker]["Close"].iloc[-4]
+        close_5d = data[ticker]["Close"].iloc[-6]
 
         value_today = close_today * qty
         value_yesterday = close_yesterday * qty
+        value_3d = close_3d * qty
+        value_5d = close_5d * qty
         invested = avg_price * qty
 
         daily_pnl = value_today - value_yesterday
@@ -120,6 +128,8 @@ for i, row in portfolio.iterrows():
 
         total_value_today += value_today
         total_value_yesterday += value_yesterday
+        total_value_3d += value_3d
+        total_value_5d += value_5d
         total_cost += invested
 
         results.append({
@@ -172,6 +182,12 @@ log("---------------------------------------------------------------------------
 portfolio_return_amt = total_value_today - total_value_yesterday
 portfolio_return = (portfolio_return_amt / total_value_yesterday) * 100
 
+portfolio_return_amt_3d = total_value_today - total_value_3d
+portfolio_return_3d = (portfolio_return_amt_3d / total_value_3d) * 100
+
+portfolio_return_amt_5d = total_value_today - total_value_5d
+portfolio_return_5d = (portfolio_return_amt_3d / total_value_5d) * 100
+
 total_profit = total_value_today - total_cost
 total_profit_perc = (total_profit * 100) / total_cost
 
@@ -180,12 +196,24 @@ total_profit_perc = (total_profit * 100) / total_cost
 # ---------------------------
 nifty_today = data[NIFTY_TICKER]["Close"].iloc[-1]
 nifty_yesterday = data[NIFTY_TICKER]["Close"].iloc[-2]
+nifty_3d = data[NIFTY_TICKER]["Close"].iloc[-4]
+nifty_5d = data[NIFTY_TICKER]["Close"].iloc[-6]
 
 nifty_return = (
     (nifty_today - nifty_yesterday) / nifty_yesterday
 ) * 100
 
+nifty_return_3d = (
+    (nifty_today - nifty_3d) / nifty_3d
+) * 100
+
+nifty_return_5d = (
+    (nifty_today - nifty_5d) / nifty_5d
+) * 100
+
 alpha = portfolio_return - nifty_return
+alpha_3d = portfolio_return_3d - nifty_return_3d
+alpha_5d = portfolio_return_5d - nifty_return_5d
 
 # ---------------------------
 # MARKET STATUS
@@ -230,6 +258,14 @@ log(f"Total P/L %: {plus(total_profit_perc)}{total_profit_perc:.2f}")
 log(f"\n1D Nifty Return: {plus(nifty_return)}{nifty_return:.2f}%")
 log(f"1D Portfolio Return: {plus(portfolio_return)}{portfolio_return:.2f}%")
 log(f"Alpha vs Nifty: {plus(alpha)}{alpha:.2f}%")
+
+log(f"\n3D Nifty Return: {plus(nifty_return_3d)}{nifty_return_3d:.2f}%")
+log(f"3D Portfolio Return: {plus(portfolio_return_3d)}{portfolio_return_3d:.2f}%")
+log(f"3D Alpha vs Nifty: {plus(alpha_3d)}{alpha_3d:.2f}%")
+
+log(f"\n5D Nifty Return: {plus(nifty_return_5d)}{nifty_return_5d:.2f}%")
+log(f"5D Portfolio Return: {plus(portfolio_return_5d)}{portfolio_return_5d:.2f}%")
+log(f"5D Alpha vs Nifty: {plus(alpha_5d)}{alpha_5d:.2f}%")
 
 log(f"\nMarket Status: {market_status}")
 
