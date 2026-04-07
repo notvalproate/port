@@ -246,7 +246,7 @@ locale.setlocale(locale.LC_ALL, "en_IN.UTF-8")
 log("\n===========================")
 log("📊 DAILY PORTFOLIO REPORT")
 log("===========================")
-log(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
+log(f"Date: {now.strftime('%Y-%m-%d')}")
 
 log(f"\nPortfolio Cost: ₹{locale.format_string("%d", total_cost, grouping=True)}")
 log(f"Portfolio Value: ₹{locale.format_string("%d", total_value_today, grouping=True)}")
