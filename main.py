@@ -155,26 +155,30 @@ results.sort(key=lambda x: x["daily_perc"], reverse=True)
 # ---------------------------
 
 log(f"\n📈 STOCK PERFORMANCE | {now.strftime("%d/%m/%Y")} | (Sorted by Day %)\n")
-log("--------------------------------------------------------------------------------")
-log(f"TICKER     || Invested ||    Today ||       Day | Total P&L  ||   Day% | Total%")
-log("--------------------------------------------------------------------------------")
+log("---------------------------------------------------------------------------------------------")
+log(f"TICKER     ||  SHARE || Invested ||    Today ||        Day | Total P&L  ||    Day% | Total%")
+log("---------------------------------------------------------------------------------------------")
 
 loser_line = False
 
 for r in results:
     if r['daily_perc'] < 0 and not loser_line:
         loser_line = True
-        log("---------------------------------TODAY'S LOSERS---------------------------------")
+        log("----------------------------------------TODAY'S LOSERS---------------------------------------")
+
+    daily_perc_text = f"{plus(r['daily_perc'])}{r['daily_perc']:,.2f}%"
+    total_perc_text = f"{plus(r['total_perc'])}{r['total_perc']:,.2f}%"
 
     log(
         f"{r['ticker']:10} || "
+        f"{(100 * (r['invested'] / total_cost)):>5,.2f}% || "
         f"{f"₹{r['invested']:,.0f}":>8} || "
         f"{f"₹{r['value_today']:,.0f}":>8} || "
-        f"{f"₹{r['daily_pnl']:,.2f}":>9} | {f"₹{r['total_pnl']:,.2f}":<10} || "
-        f"{plus(r['daily_perc'])}{r['daily_perc']:,.2f}% | {plus(r['total_perc'])}{r['total_perc']:,.2f}%"
+        f"{f"₹{r['daily_pnl']:,.2f}":>10} | {f"₹{r['total_pnl']:,.2f}":<10} || "
+        f"{daily_perc_text:>7} | {total_perc_text:>7}"
     )
 
-log("--------------------------------------------------------------------------------")
+log("---------------------------------------------------------------------------------------------")
 
 # ---------------------------
 # PORTFOLIO RETURNS
@@ -214,6 +218,10 @@ nifty_return_5d = (
 alpha = portfolio_return - nifty_return
 alpha_3d = portfolio_return_3d - nifty_return_3d
 alpha_5d = portfolio_return_5d - nifty_return_5d
+
+participation = (portfolio_return / nifty_return) * 100
+participation_3d = (portfolio_return_3d / nifty_return_3d) * 100
+participation_5d = (portfolio_return_5d / nifty_return_5d) * 100
 
 # ---------------------------
 # MARKET STATUS
@@ -258,14 +266,17 @@ log(f"Total P/L %: {plus(total_profit_perc)}{total_profit_perc:.2f}")
 log(f"\n1D Nifty Return: {plus(nifty_return)}{nifty_return:.2f}%")
 log(f"1D Portfolio Return: {plus(portfolio_return)}{portfolio_return:.2f}%")
 log(f"Alpha vs Nifty: {plus(alpha)}{alpha:.2f}%")
+log(f"Participation: {plus(participation)}{participation:.2f}%")
 
 log(f"\n3D Nifty Return: {plus(nifty_return_3d)}{nifty_return_3d:.2f}%")
 log(f"3D Portfolio Return: {plus(portfolio_return_3d)}{portfolio_return_3d:.2f}%")
 log(f"3D Alpha vs Nifty: {plus(alpha_3d)}{alpha_3d:.2f}%")
+log(f"3D Participation: {plus(participation_3d)}{participation_3d:.2f}%")
 
 log(f"\n5D Nifty Return: {plus(nifty_return_5d)}{nifty_return_5d:.2f}%")
 log(f"5D Portfolio Return: {plus(portfolio_return_5d)}{portfolio_return_5d:.2f}%")
 log(f"5D Alpha vs Nifty: {plus(alpha_5d)}{alpha_5d:.2f}%")
+log(f"5D Participation: {plus(participation_5d)}{participation_5d:.2f}%")
 
 log(f"\nMarket Status: {market_status}")
 
