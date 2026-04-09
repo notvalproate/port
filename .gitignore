@@ -216,5 +216,4 @@ __marimo__/
 .streamlit/secrets.toml
 
 portfolio.csv
-report.txt
 reports
