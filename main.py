@@ -449,6 +449,7 @@ html_content = f"""<!DOCTYPE html>
             --bg-primary: #0d1117;
             --bg-secondary: #161b22;
             --bg-tertiary: #21262d;
+            --bg-tertiary-hover: #363e49;
             --text-primary: #e6edf3;
             --text-secondary: #8b949e;
             --border-color: #30363d;
@@ -456,6 +457,7 @@ html_content = f"""<!DOCTYPE html>
             --negative: #f85149;
             --neutral: #8b949e;
             --accent: #58a6ff;
+            --accent-hover: #80bbff;
             --warning: #d29922;
         }}
         
@@ -642,7 +644,17 @@ html_content = f"""<!DOCTYPE html>
         
         .ticker {{
             font-weight: 600;
+        }}
+
+        .ticker a {{
+            text-decoration: none;
             color: var(--accent);
+            transition: 200ms;
+        }}
+
+        .ticker a:hover {{
+            color: var(--accent-hover);
+            cursor: pointer;
         }}
         
         .loser-divider {{
@@ -765,6 +777,12 @@ html_content = f"""<!DOCTYPE html>
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: var(--text-primary);
+            transition: 200ms;
+        }}
+
+        .index-item:hover {{
+            background: var(--bg-tertiary-hover);
         }}
         
         .index-name {{
@@ -919,7 +937,7 @@ for r in results:
     
     html_content += f"""
                     <tr>
-                        <td class="ticker">{r['ticker']}</td>
+                        <td class="ticker"><a target="_blank" href="https://in.tradingview.com/symbols/NSE-{r['ticker']}">{r['ticker']}</a></td>
                         <td>{r['share']:.1f}%</td>
                         <td>{format_currency(r['invested'])}</td>
                         <td>{format_currency(r['value_today'])}</td>
@@ -945,13 +963,24 @@ html_content += """
                 <div class="index-grid">
 """
 
+urls = [
+    "https://in.tradingview.com/symbols/NSE-NIFTY",
+    "https://in.tradingview.com/symbols/BSE-SENSEX",
+    "https://in.tradingview.com/symbols/NSE-CNXMIDCAP",
+    "https://in.tradingview.com/symbols/NSE-CNXSMALLCAP"
+]
+url_index = 0
+
 for name, change in results_index.items():
     html_content += f"""
-                    <div class="index-item">
-                        <span class="index-name">{name}</span>
-                        <span class="index-value {color_class(change)}">{format_percent(change)}</span>
-                    </div>
+                    <a style="text-decoration: none;" href="{urls[url_index]}" target="_blank">
+                        <div class="index-item">
+                            <span class="index-name">{name}</span>
+                            <span class="index-value {color_class(change)}">{format_percent(change)}</span>
+                        </div>
+                    </a>
 """
+    url_index = url_index + 1
 
 html_content += f"""
                 </div>
