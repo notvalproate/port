@@ -244,6 +244,9 @@ def get_market_status():
 
     return "Unavailable"
 
+def get_higher_lower(nifty_return_rate):
+    return "(Higher is Better)" if nifty_return_rate >= 0 else "(Lower is Better)"
+
 market_status = get_market_status()
 
 # ---------------------------
@@ -266,17 +269,17 @@ log(f"Total P/L %: {plus(total_profit_perc)}{total_profit_perc:.2f}")
 log(f"\n1D Nifty Return: {plus(nifty_return)}{nifty_return:.2f}%")
 log(f"1D Portfolio Return: {plus(portfolio_return)}{portfolio_return:.2f}%")
 log(f"Alpha vs Nifty: {plus(alpha)}{alpha:.2f}%")
-log(f"Participation: {plus(participation)}{participation:.2f}%")
+log(f"Participation: {plus(participation)}{participation:.2f}% {get_higher_lower(nifty_return)}")
 
 log(f"\n3D Nifty Return: {plus(nifty_return_3d)}{nifty_return_3d:.2f}%")
 log(f"3D Portfolio Return: {plus(portfolio_return_3d)}{portfolio_return_3d:.2f}%")
 log(f"3D Alpha vs Nifty: {plus(alpha_3d)}{alpha_3d:.2f}%")
-log(f"3D Participation: {plus(participation_3d)}{participation_3d:.2f}%")
+log(f"3D Participation: {plus(participation_3d)}{participation_3d:.2f}% {get_higher_lower(nifty_return_3d)}")
 
 log(f"\n5D Nifty Return: {plus(nifty_return_5d)}{nifty_return_5d:.2f}%")
 log(f"5D Portfolio Return: {plus(portfolio_return_5d)}{portfolio_return_5d:.2f}%")
 log(f"5D Alpha vs Nifty: {plus(alpha_5d)}{alpha_5d:.2f}%")
-log(f"5D Participation: {plus(participation_5d)}{participation_5d:.2f}%")
+log(f"5D Participation: {plus(participation_5d)}{participation_5d:.2f}% {get_higher_lower(nifty_return_5d)}")
 
 log(f"\nMarket Status: {market_status}")
 
@@ -304,6 +307,7 @@ def index_change(symbol):
     close_yesterday = data[symbol]["Close"].iloc[-2]
 
     return 100 * (close_today - close_yesterday) / close_yesterday
+    
 
 log("\n===========================")
 log("📊 INDEX CHECK")
