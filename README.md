@@ -15,8 +15,8 @@ python3 main.py
 ```
 Four files are generated in the `reports` folder:
 - **latest.html** - latest generated html report
-- **{todays_date}.html** - html report generated with todays date (example: 2026_04_09.html)
+- **{todays_date}.html** - html report generated with todays date _(example: 2026_04_09.html)_
 - **/txt/latest.html** - latest generated text report
-- **/txt/{todays_date}.html** - text report generated with todays date (example: 2026_04_09.txt)
+- **/txt/{todays_date}.html** - text report generated with todays date _(example: 2026_04_09.txt)_
 
 Enjoy!
