@@ -431,7 +431,7 @@ def color_class(val):
 
 def format_currency(val):
     """Format number as Indian currency."""
-    return f"₹{val:,.0f}"
+    return f"₹{locale.format_string('%d', val, grouping=True)}"
 
 def format_percent(val):
     """Format percentage with sign."""
