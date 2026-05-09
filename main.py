@@ -83,7 +83,7 @@ tickers = list(portfolio["YF_Ticker"]) + [NIFTY_TICKER, SENSEX_TICKER,
 # ---------------------------
 # DOWNLOAD DATA
 # ---------------------------
-DATA_PERIOD_IN_DAYS = 6
+DATA_PERIOD_IN_DAYS = 20
 
 data = yf.download(
     tickers,
@@ -95,8 +95,8 @@ data = yf.download(
 
 total_value_today = 0
 total_value_yesterday = 0
-total_value_3d = 0
-total_value_5d = 0
+total_value_7d = 0
+total_value_14d = 0
 total_cost = 0
 results = []
 
@@ -108,13 +108,13 @@ for i, row in portfolio.iterrows():
     try:
         close_today = data[ticker]["Close"].iloc[-1]
         close_yesterday = data[ticker]["Close"].iloc[-2]
-        close_3d = data[ticker]["Close"].iloc[-4]
-        close_5d = data[ticker]["Close"].iloc[-6]
+        close_7d = data[ticker]["Close"].iloc[-8]
+        close_14d = data[ticker]["Close"].iloc[-15]
 
         value_today = close_today * qty
         value_yesterday = close_yesterday * qty
-        value_3d = close_3d * qty
-        value_5d = close_5d * qty
+        value_7d = close_7d * qty
+        value_14d = close_14d * qty
         invested = avg_price * qty
 
         daily_pnl = value_today - value_yesterday
@@ -124,8 +124,8 @@ for i, row in portfolio.iterrows():
 
         total_value_today += value_today
         total_value_yesterday += value_yesterday
-        total_value_3d += value_3d
-        total_value_5d += value_5d
+        total_value_7d += value_7d
+        total_value_14d += value_14d
         total_cost += invested
 
         results.append({
@@ -185,11 +185,11 @@ log("---------------------------------------------------------------------------
 portfolio_return_amt = total_value_today - total_value_yesterday
 portfolio_return = (portfolio_return_amt / total_value_yesterday) * 100
 
-portfolio_return_amt_3d = total_value_today - total_value_3d
-portfolio_return_3d = (portfolio_return_amt_3d / total_value_3d) * 100
+portfolio_return_amt_7d = total_value_today - total_value_7d
+portfolio_return_7d = (portfolio_return_amt_7d / total_value_7d) * 100
 
-portfolio_return_amt_5d = total_value_today - total_value_5d
-portfolio_return_5d = (portfolio_return_amt_5d / total_value_5d) * 100
+portfolio_return_amt_14d = total_value_today - total_value_14d
+portfolio_return_14d = (portfolio_return_amt_14d / total_value_14d) * 100
 
 total_profit = total_value_today - total_cost
 total_profit_perc = (total_profit * 100) / total_cost
@@ -199,20 +199,20 @@ total_profit_perc = (total_profit * 100) / total_cost
 # ---------------------------
 nifty_today = data[NIFTY_TICKER]["Close"].iloc[-1]
 nifty_yesterday = data[NIFTY_TICKER]["Close"].iloc[-2]
-nifty_3d = data[NIFTY_TICKER]["Close"].iloc[-4]
-nifty_5d = data[NIFTY_TICKER]["Close"].iloc[-6]
+nifty_7d = data[NIFTY_TICKER]["Close"].iloc[-8]
+nifty_14d = data[NIFTY_TICKER]["Close"].iloc[-15]
 
 nifty_return = ((nifty_today - nifty_yesterday) / nifty_yesterday) * 100
-nifty_return_3d = ((nifty_today - nifty_3d) / nifty_3d) * 100
-nifty_return_5d = ((nifty_today - nifty_5d) / nifty_5d) * 100
+nifty_return_7d = ((nifty_today - nifty_7d) / nifty_7d) * 100
+nifty_return_14d = ((nifty_today - nifty_14d) / nifty_14d) * 100
 
 alpha = portfolio_return - nifty_return
-alpha_3d = portfolio_return_3d - nifty_return_3d
-alpha_5d = portfolio_return_5d - nifty_return_5d
+alpha_7d = portfolio_return_7d - nifty_return_7d
+alpha_14d = portfolio_return_14d - nifty_return_14d
 
 participation = (portfolio_return / nifty_return) * 100 if nifty_return != 0 else 0
-participation_3d = (portfolio_return_3d / nifty_return_3d) * 100 if nifty_return_3d != 0 else 0
-participation_5d = (portfolio_return_5d / nifty_return_5d) * 100 if nifty_return_5d != 0 else 0
+participation_7d = (portfolio_return_7d / nifty_return_7d) * 100 if nifty_return_7d != 0 else 0
+participation_14d = (portfolio_return_14d / nifty_return_14d) * 100 if nifty_return_14d != 0 else 0
 
 # ---------------------------
 # MARKET STATUS
@@ -261,15 +261,15 @@ log(f"1D Portfolio Return: {plus(portfolio_return)}{portfolio_return:.2f}%")
 log(f"Alpha vs Nifty: {plus(alpha)}{alpha:.2f}%")
 log(f"Participation: {plus(participation)}{participation:.2f}% {get_higher_lower(nifty_return)}")
 
-log(f"\n3D Nifty Return: {plus(nifty_return_3d)}{nifty_return_3d:.2f}%")
-log(f"3D Portfolio Return: {plus(portfolio_return_3d)}{portfolio_return_3d:.2f}%")
-log(f"3D Alpha vs Nifty: {plus(alpha_3d)}{alpha_3d:.2f}%")
-log(f"3D Participation: {plus(participation_3d)}{participation_3d:.2f}% {get_higher_lower(nifty_return_3d)}")
+log(f"\n7d Nifty Return: {plus(nifty_return_7d)}{nifty_return_7d:.2f}%")
+log(f"7D Portfolio Return: {plus(portfolio_return_7d)}{portfolio_return_7d:.2f}%")
+log(f"7D Alpha vs Nifty: {plus(alpha_7d)}{alpha_7d:.2f}%")
+log(f"7D Participation: {plus(participation_7d)}{participation_7d:.2f}% {get_higher_lower(nifty_return_7d)}")
 
-log(f"\n5D Nifty Return: {plus(nifty_return_5d)}{nifty_return_5d:.2f}%")
-log(f"5D Portfolio Return: {plus(portfolio_return_5d)}{portfolio_return_5d:.2f}%")
-log(f"5D Alpha vs Nifty: {plus(alpha_5d)}{alpha_5d:.2f}%")
-log(f"5D Participation: {plus(participation_5d)}{participation_5d:.2f}% {get_higher_lower(nifty_return_5d)}")
+log(f"\n14d Nifty Return: {plus(nifty_return_14d)}{nifty_return_14d:.2f}%")
+log(f"14D Portfolio Return: {plus(portfolio_return_14d)}{portfolio_return_14d:.2f}%")
+log(f"14D Alpha vs Nifty: {plus(alpha_14d)}{alpha_14d:.2f}%")
+log(f"14D Participation: {plus(participation_14d)}{participation_14d:.2f}% {get_higher_lower(nifty_return_14d)}")
 
 log(f"\nMarket Status: {market_status}")
 
@@ -884,20 +884,20 @@ html_content = f"""<!DOCTYPE html>
                     <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(nifty_return)}</div>
                 </div>
                 <div class="comparison-item">
-                    <div class="period">3 Days</div>
-                    <div class="value {color_class(portfolio_return_3d)}">Portfolio: {format_percent(portfolio_return_3d)}</div>
-                    <div class="value {color_class(nifty_return_3d)}" style="margin-top: 4px;">Nifty: {format_percent(nifty_return_3d)}</div>
-                    <div class="value {color_class(alpha_3d)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_3d)}</div>
-                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_3d)}</div>
-                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(nifty_return_3d)}</div>
+                    <div class="period">7 Days</div>
+                    <div class="value {color_class(portfolio_return_7d)}">Portfolio: {format_percent(portfolio_return_7d)}</div>
+                    <div class="value {color_class(nifty_return_7d)}" style="margin-top: 4px;">Nifty: {format_percent(nifty_return_7d)}</div>
+                    <div class="value {color_class(alpha_7d)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_7d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_7d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(nifty_return_7d)}</div>
                 </div>
                 <div class="comparison-item">
-                    <div class="period">5 Days</div>
-                    <div class="value {color_class(portfolio_return_5d)}">Portfolio: {format_percent(portfolio_return_5d)}</div>
-                    <div class="value {color_class(nifty_return_5d)}" style="margin-top: 4px;">Nifty: {format_percent(nifty_return_5d)}</div>
-                    <div class="value {color_class(alpha_5d)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_5d)}</div>
-                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_5d)}</div>
-                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(nifty_return_5d)}</div>
+                    <div class="period">14 Days</div>
+                    <div class="value {color_class(portfolio_return_14d)}">Portfolio: {format_percent(portfolio_return_14d)}</div>
+                    <div class="value {color_class(nifty_return_14d)}" style="margin-top: 4px;">Nifty: {format_percent(nifty_return_14d)}</div>
+                    <div class="value {color_class(alpha_14d)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_14d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_14d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(nifty_return_14d)}</div>
                 </div>
             </div>
             <div class="interpretation">
