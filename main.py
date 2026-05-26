@@ -215,6 +215,26 @@ participation_7d = (portfolio_return_7d / nifty_return_7d) * 100 if nifty_return
 participation_14d = (portfolio_return_14d / nifty_return_14d) * 100 if nifty_return_14d != 0 else 0
 
 # ---------------------------
+# MIDCAP RETURN
+# ---------------------------
+midcap_today = data[MIDCAP_TICKER]["Close"].iloc[-1]
+midcap_yesterday = data[MIDCAP_TICKER]["Close"].iloc[-2]
+midcap_7d = data[MIDCAP_TICKER]["Close"].iloc[-8]
+midcap_14d = data[MIDCAP_TICKER]["Close"].iloc[-15]
+
+midcap_return = ((midcap_today - midcap_yesterday) / midcap_yesterday) * 100
+midcap_return_7d = ((midcap_today - midcap_7d) / midcap_7d) * 100
+midcap_return_14d = ((midcap_today - midcap_14d) / midcap_14d) * 100
+
+alpha_mc = portfolio_return - midcap_return
+alpha_mc_7d = portfolio_return_7d - midcap_return_7d
+alpha_mc_14d = portfolio_return_14d - midcap_return_14d
+
+participation_mc = (portfolio_return / midcap_return) * 100 if midcap_return != 0 else 0
+participation_mc_7d = (portfolio_return_7d / midcap_return_7d) * 100 if midcap_return_7d != 0 else 0
+participation_mc_14d = (portfolio_return_14d / midcap_return_14d) * 100 if midcap_return_14d != 0 else 0
+
+# ---------------------------
 # MARKET STATUS
 # ---------------------------
 def get_market_status():
@@ -271,6 +291,21 @@ log(f"14D Portfolio Return: {plus(portfolio_return_14d)}{portfolio_return_14d:.2
 log(f"14D Alpha vs Nifty: {plus(alpha_14d)}{alpha_14d:.2f}%")
 log(f"14D Participation: {plus(participation_14d)}{participation_14d:.2f}% {get_higher_lower(nifty_return_14d)}")
 
+log(f"\n1D Midcap Return: {plus(midcap_return)}{midcap_return:.2f}%")
+log(f"1D Portfolio Return: {plus(portfolio_return)}{portfolio_return:.2f}%")
+log(f"Alpha vs Midcap: {plus(alpha_mc)}{alpha_mc:.2f}%")
+log(f"Participation: {plus(participation_mc)}{participation_mc:.2f}% {get_higher_lower(midcap_return)}")
+
+log(f"\n7d Midcap Return: {plus(midcap_return_7d)}{midcap_return_7d:.2f}%")
+log(f"7D Portfolio Return: {plus(portfolio_return_7d)}{portfolio_return_7d:.2f}%")
+log(f"7D Alpha vs Midcap: {plus(alpha_mc_7d)}{alpha_mc_7d:.2f}%")
+log(f"7D Participation: {plus(participation_mc_7d)}{participation_mc_7d:.2f}% {get_higher_lower(midcap_return_7d)}")
+
+log(f"\n14d Midcap Return: {plus(midcap_return_14d)}{midcap_return_14d:.2f}%")
+log(f"14D Portfolio Return: {plus(portfolio_return_14d)}{portfolio_return_14d:.2f}%")
+log(f"14D Alpha vs Midcap: {plus(alpha_mc_14d)}{alpha_mc_14d:.2f}%")
+log(f"14D Participation: {plus(participation_mc_14d)}{participation_mc_14d:.2f}% {get_higher_lower(midcap_return_14d)}")
+
 log(f"\nMarket Status: {market_status}")
 
 log("\n🧠 INTERPRETATION")
@@ -290,6 +325,19 @@ else:
 
 for line in interpretation_txt:
     log(line)
+
+interpretation_mc_txt = []
+if alpha_mc > 0:
+    interpretation_mc_txt.append("✅ Portfolio showing RELATIVE STRENGTH vs Midcap")
+else:
+    interpretation_mc_txt.append("⚠️ Portfolio underperforming Midcap index")
+
+if midcap_return < 0 and portfolio_return > 0:
+    interpretation_mc_txt.append("🔥 Excellent signal: Green portfolio on red midcap market")
+elif midcap_return > 0 and portfolio_return < 0:
+    interpretation_mc_txt.append("🚨 WARNING: Midcap up but portfolio lagging")
+else:
+    interpretation_mc_txt.append("ℹ️ Neutral behaviour vs Midcap")
 
 def index_change(symbol):
     global data
@@ -902,6 +950,40 @@ html_content = f"""<!DOCTYPE html>
             </div>
             <div class="interpretation">
                 {''.join(f'<p>{line}</p>' for line in interpretation_txt)}
+            </div>
+        </div>
+
+        <!-- Portfolio vs Midcap -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2><span class="icon">⚖️</span> Portfolio vs Midcap 100</h2>
+            <div class="comparison">
+                <div class="comparison-item">
+                    <div class="period">1 Day</div>
+                    <div class="value {color_class(portfolio_return)}">Portfolio: {format_percent(portfolio_return)}</div>
+                    <div class="value {color_class(midcap_return)}" style="margin-top: 4px;">Midcap: {format_percent(midcap_return)}</div>
+                    <div class="value {color_class(alpha_mc)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_mc)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_mc)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(midcap_return)}</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="period">7 Days</div>
+                    <div class="value {color_class(portfolio_return_7d)}">Portfolio: {format_percent(portfolio_return_7d)}</div>
+                    <div class="value {color_class(midcap_return_7d)}" style="margin-top: 4px;">Midcap: {format_percent(midcap_return_7d)}</div>
+                    <div class="value {color_class(alpha_mc_7d)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_mc_7d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_mc_7d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(midcap_return_7d)}</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="period">14 Days</div>
+                    <div class="value {color_class(portfolio_return_14d)}">Portfolio: {format_percent(portfolio_return_14d)}</div>
+                    <div class="value {color_class(midcap_return_14d)}" style="margin-top: 4px;">Midcap: {format_percent(midcap_return_14d)}</div>
+                    <div class="value {color_class(alpha_mc_14d)}" style="margin-top: 8px; font-size: 0.9rem;">Alpha: {format_percent(alpha_mc_14d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 80%;">Participation: {format_percent(participation_mc_14d)}</div>
+                    <div class="value" style="margin-top: 8px; font-size: 0.8rem; opacity: 40%;">{get_higher_lower(midcap_return_14d)}</div>
+                </div>
+            </div>
+            <div class="interpretation">
+                {''.join(f'<p>{line}</p>' for line in interpretation_mc_txt)}
             </div>
         </div>
         
